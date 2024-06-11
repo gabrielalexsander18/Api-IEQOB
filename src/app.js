@@ -10,7 +10,7 @@ import './database'
 class App {
   constructor() {
     this.app = express()
-
+    this.app.use(express.urlencoded({ extended: true }))
     // Applying middleware to parse JSON request bodies
     this.middlewares()
     // Applying the routes to the application
