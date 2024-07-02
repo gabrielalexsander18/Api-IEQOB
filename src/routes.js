@@ -21,9 +21,12 @@ routes.post('/session', SessionController.store)
 routes.use(authMiddleware)
 routes.post('/postimg', uploads.single('file'), ImagesController.store)
 routes.get('/postimg', ImagesController.index)
+routes.put('/postimg/:id', uploads.single('file'), ImagesController.update)
 
 routes.post('/categories', CategoryController.store)
 routes.get('/categories', CategoryController.index)
 
+routes.get('/users', UserController.index)
+routes.put('/users/:id', UserController.update)
 // Exporting the routes instance to be used in other parts of the application
 export default routes

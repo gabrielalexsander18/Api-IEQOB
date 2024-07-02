@@ -66,6 +66,74 @@ class UserController {
     // Return a 201 response with the created user's details
     return response.status(201).json({ id: user.id, name, email, admin, dev })
   }
+
+  async update(request, response) {
+    // Define the schema for user creation using Yup
+    const schema = Yup.object({
+      // The user's admin status is a boolean
+      admin: Yup.boolean(),
+      // The user's dev status is a boolean
+      dev: Yup.boolean(),
+    })
+
+    try {
+      // Validate the request body against the schema
+      schema.validateSync(request.body, { abortEarly: false })
+    } catch (err) {
+      // If the validation fails, return a 400 error with the error message
+      return response.status(400).json({ error: err.errors })
+    }
+
+    const { dev: isDev } = await User.findByPk(request.userId)
+
+    if (!isDev) {
+      return response.status(401).json()
+    }
+
+    const { id } = request.params
+
+    const findUser = await User.findByPk(id)
+
+    if (!findUser) {
+      return response
+        .status(400)
+        .json({ error: 'Make sure your user ID is correct' })
+    }
+    /// olhar o porque esta dando errado quando da um erro esta crashando o servidor
+    const { admin, dev } = request.body
+
+    await User.update(
+      {
+        admin,
+        dev,
+      },
+      {
+        where: {
+          id,
+        },
+      },
+    )
+
+    return response.status(200).json({ mensage: 'Office update sucessfully' })
+  }
+
+  async index(request, response) {
+    // Retrieve the user with the given ID and check if they are a developer
+    const { dev: isDev } = await User.findByPk(request.userId)
+
+    // If the user is not a developer, return a 401 Unauthorized response
+    if (!isDev) {
+      return response
+        .status(401)
+        .json({ message: 'You do not have access permission' })
+    }
+
+    // Retrieve all user accounts
+    const usersAccounts = await User.findAll()
+
+    // Return the list of user accounts in the response
+    return response.json(usersAccounts)
+  }
 }
 
 export default new UserController()
