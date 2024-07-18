@@ -99,7 +99,7 @@ class UserController {
         .status(400)
         .json({ error: 'Make sure your user ID is correct' })
     }
-    /// olhar o porque esta dando errado quando da um erro esta crashando o servidor
+    // /// olhar o porque esta dando errado quando da um erro esta crashando o servidor
     const { admin, dev } = request.body
 
     await User.update(
