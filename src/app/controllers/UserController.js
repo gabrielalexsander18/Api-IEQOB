@@ -5,7 +5,7 @@
     update => Atualizar
     delete => Deletar
 */
-import { v4 } from 'uuid'
+import { v4, validate as uuidValidate } from 'uuid'
 import * as Yup from 'yup'
 
 import User from '../models/User'
@@ -92,14 +92,30 @@ class UserController {
 
     const { id } = request.params
 
-    const findUser = await User.findByPk(id)
-
-    if (!findUser) {
+    if (!uuidValidate(id)) {
       return response
         .status(400)
-        .json({ error: 'Make sure your user ID is correct' })
+        .json({ error: 'Make sure your user ID is a valid UUID' })
     }
-    // /// olhar o porque esta dando errado quando da um erro esta crashando o servidor
+
+    try {
+      const findUser = await User.findByPk(id)
+
+      if (!findUser) {
+        return response
+          .status(400)
+          .json({ error: 'Make sure your user ID is correct' })
+      }
+
+      // Continue com o processamento se o usuário for encontrado
+      // Continue with processing if the user is found
+      // ...
+    } catch (error) {
+      return response
+        .status(500)
+        .json({ error: 'An error occurred while fetching the user' })
+    }
+
     const { admin, dev } = request.body
 
     await User.update(
